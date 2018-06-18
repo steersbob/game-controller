@@ -5,7 +5,7 @@ Example of how to import and use the brewblox service
 from aiohttp import web
 from brewblox_service import brewblox_logger, events, service
 
-from game_controller import reader
+from game_controller import reader, broadcaster
 
 routes = web.RouteTableDef()
 LOGGER = brewblox_logger(__name__)
@@ -17,6 +17,9 @@ def create_parser(default_name='game'):
                         help='Interval (in seconds) between broadcasts of controller state. [%(default)s]',
                         type=float,
                         default=0.1)
+    parser.add_argument('--broadcast-exchange',
+                        help='Eventbus exchange to which controller state should be broadcasted. [%(default)s]',
+                        default='brewcast')
     return parser
 
 
@@ -25,6 +28,7 @@ def main():
 
     events.setup(app)
     reader.setup(app)
+    broadcaster.setup(app)
 
     service.furnish(app)
     service.run(app)

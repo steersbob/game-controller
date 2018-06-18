@@ -16,6 +16,10 @@ routes = web.RouteTableDef()
 DEADZONE = 4000
 
 
+def get_reader(app: web.Application) -> 'ControllerReader':
+    return features.get(app, ControllerReader)
+
+
 def setup(app: web.Application):
     features.add(app, ControllerReader(app))
     app.router.add_routes(routes)
@@ -40,16 +44,6 @@ class ControllerReader(features.ServiceFeature):
 
         self._transport = None
         self._protocol = None
-
-    def _scaled_axis(self, raw, deadzone=DEADZONE):
-        raw = int(raw)
-        if abs(raw) < deadzone:
-            return 0.0
-        else:
-            if raw < 0:
-                return (raw + deadzone) / (32768.0 - deadzone)
-            else:
-                return (raw - deadzone) / (32767.0 - deadzone)
 
     @property
     def latest(self):
@@ -89,7 +83,18 @@ class ControllerReader(features.ServiceFeature):
             'right_trigger': int(raw[136:139]) / 255.0
         }
 
+    def _scaled_axis(self, raw, deadzone=DEADZONE):
+        raw = int(raw)
+        if abs(raw) < deadzone:
+            return 0.0
+        else:
+            if raw < 0:
+                return (raw + deadzone) / (32768.0 - deadzone)
+            else:
+                return (raw - deadzone) / (32767.0 - deadzone)
+
     async def startup(self, app: web.Application):
+        await self.shutdown(app)
         self._transport, self._protocol = await app.loop.subprocess_exec(
             ControllerProtocol,
             'xboxdrv', '--no-uinput', '--detach-kernel-driver',
