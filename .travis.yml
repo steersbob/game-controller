@@ -25,12 +25,12 @@ deploy:
   - provider: script
     script:
       bbt-deploy-docker
-      --image docker
+      --image amd_docker
       --name "$DOCKER_REPO"
       --tags "$TRAVIS_BRANCH"
       &&
       bbt-deploy-docker
-      --image rpi-docker
+      --image arm_docker
       --name "$DOCKER_REPO"
       --tags rpi-$TRAVIS_BRANCH
     skip_cleanup: true
