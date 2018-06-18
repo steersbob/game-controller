@@ -16,7 +16,7 @@ install: pip install tox brewblox-tools~=0.2.0
 script: tox
 
 before_deploy:
-  bbt-distcopy .tox/dist/ docker/pkg/ rpi-docker/pkg/
+  bbt-distcopy .tox/dist/ amd_docker/pkg/ arm_docker/pkg/
   && docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
   && docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
