@@ -44,6 +44,7 @@ class ControllerReader(features.ServiceFeature):
 
         self._transport = None
         self._protocol = None
+        self._id = None
 
     @property
     def latest(self):
@@ -52,6 +53,7 @@ class ControllerReader(features.ServiceFeature):
 
         raw = self._protocol.latest
         return {
+            '_id': self._id,
             'left_stick': {
                 'x': self._scaled_axis(raw[3:9]),
                 'y': self._scaled_axis(raw[13:19]),
@@ -95,9 +97,10 @@ class ControllerReader(features.ServiceFeature):
 
     async def startup(self, app: web.Application):
         await self.shutdown(app)
+        self._id = app['config']['controller-id']
         self._transport, self._protocol = await app.loop.subprocess_exec(
             ControllerProtocol,
-            'xboxdrv', '--no-uinput', '--detach-kernel-driver',
+            'xboxdrv', '--no-uinput', '--detach-kernel-driver', '--id', str(self._id),
             stdin=None, stderr=None
         )
 

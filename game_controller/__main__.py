@@ -20,6 +20,10 @@ def create_parser(default_name='game'):
     parser.add_argument('--broadcast-exchange',
                         help='Eventbus exchange to which controller state should be broadcasted. [%(default)s]',
                         default='brewcast')
+    parser.add_argument('--controller-id',
+                        help='Id of controller used by this service. Controller IDs are 0-indexed. [%(default)s]',
+                        type=int,
+                        default=0)
     return parser
 
 
