@@ -97,7 +97,7 @@ class ControllerReader(features.ServiceFeature):
 
     async def startup(self, app: web.Application):
         await self.shutdown(app)
-        self._id = app['config']['controller-id']
+        self._id = app['config']['controller_id']
         self._transport, self._protocol = await app.loop.subprocess_exec(
             ControllerProtocol,
             'xboxdrv', '--no-uinput', '--detach-kernel-driver', '--id', str(self._id),
